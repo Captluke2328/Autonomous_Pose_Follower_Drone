@@ -5,30 +5,33 @@ import numpy as np
 from camera import *
 
 class detector:
-    def __init__(self,C):
+    def __init__(self,C,D):
         self.ca = C
         self.net = C.ne
         self.cam = C.camera
         self.label = None
 
+        self.control = D.control_tab
+
     def get_detections(self):
         #global cx, cy,nose_idx,fps,label
-        # net = n
-        # cam = c
+        #net = n
+        #cam = c
         #net = c.net()
         #cam = c.camera()
 
         cx = None
         cy = None
+
         data = []
-        img = self.cam.Capture()
         keypoints = []
+        img = self.cam.Capture()
         poses = self.net.Process(img, overlay="links,keypoints")
         
         for pose in poses:
             
-            # print(f"Pose : {pose}")
-            print(f"Keypoints : {pose.Keypoints}")
+            #print(f"Pose : {pose}")
+            #print(f"Keypoints : {pose.Keypoints}")
             # print(f"Link : {pose.Links}")
             
             nose_idx = pose.FindKeypoint('nose')
@@ -50,24 +53,35 @@ class detector:
             left_shoulder = pose.Keypoints[left_shoulder_idx]
             right_wrist = pose.Keypoints[right_wrist_idx]
             right_shoulder = pose.Keypoints[right_shoulder_idx]
+
+            cx = neck_point.x
+            cy = neck_point.y
             
-            if (left_wrist.y < left_shoulder.y) and (right_wrist.y > right_shoulder.y):
-                self.label = "Move left"
-                
-            elif (right_wrist.y < right_shoulder.y) and (left_wrist.y > left_shoulder.y):
-                self.label = "Move Right"
-                
-            else:
-                self.label = "Searching"
+            try:
+                if (left_wrist.y < left_shoulder.y) and (right_wrist.y < right_shoulder.y) and (left_wrist.y < nose_point.y) and (right_wrist.y < nose_point.y):
+                    self.label = "Takeoff"
+                    #self.control.armAndTakeoff()
+
+                elif (left_wrist.y < left_shoulder.y) and (right_wrist.y > right_shoulder.y) and (left_wrist.y > nose_point.y) :
+                    self.label = "Move Left"
+                    #self.control.forward()
+                    
+                elif (right_wrist.y < right_shoulder.y) and (left_wrist.y > left_shoulder.y) and (right_wrist.y > nose_point.y):
+                    self.label = "Move Right"
+                    #self.control.backward()
+         
+                else:
+                    self.label = "Searching"
+            except:
+                pass
                 
             #print(nose_idx, nose_point)
             #keypoints.append([nose_idx, nose_point.x, nose_point.y])
             
+            #keypoints.append([neck_idx, neck_point.x, neck_point.y])
+        
             # cx = nose_point.x
             # cy = nose_point.y
-
-            cx = neck_point.x
-            cy = neck_point.y
             
         fps = self.net.GetNetworkFPS()
         data.append([fps, jetson.utils.cudaToNumpy(img),cx,cy])

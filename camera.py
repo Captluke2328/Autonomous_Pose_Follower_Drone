@@ -10,7 +10,9 @@ import numpy as np
 class Camera:
     def __init__(self):
         self.ne = jetson.inference.poseNet("resnet18-body", 0.15)
-        self.camera = jetson.utils.videoSource("csi://0")  
+        #self.camera = jetson.utils.videoSource("csi://0")  
+        self.camera = jetson.utils.videoSource("/dev/video0")  
+
 
     def get_image_size(self):
         self.width = self.camera.GetWidth()

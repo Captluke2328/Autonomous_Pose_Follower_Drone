@@ -2,6 +2,8 @@ import keyboard
 import jetson.inference
 import jetson.utils
 import sys, time
+import threading
+import time
 
 import cv2
 import collections
@@ -12,43 +14,67 @@ import sys
 from camera import *
 from detector import *
 
-#def setup():
-print("Setting up detector")
-cam = Camera()
-#net,cam = c.initialize_detector()
-#d.initialize_detector()
+from dronekit import *
+from config import *
 
+#def setup():
+    #net,cam = c.initialize_detector()
+    #d.initialize_detector()
 #setup()
 
-while True:
-    #fps, image = d.get_detections(net,cam)
-    #data = det.get_detections()
-
-    det = detector(cam)
-    data = det.get_detections()
-    #fps,image = det.get_detections()
-
-    # Convert image into RGB Format
-    frame = cv2.cvtColor(data[0][1], cv2.COLOR_BGR2RGB)
-    #frame = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+def thread_function(z):
     
-    # d.visualize(frame)
-    # z = (d.get_pose())
+    if (z=="Takeoff"):
+        drone.control_tab.armAndTakeoff()
 
-    det.visualize(frame,data)
-    z = (det.get_pose())
-    print(z)
-        
-    cv2.imshow("Capture",frame)
-    if cv2.waitKey(1) & 0XFF == ord('q'):
-        cam.close_camera()
-        break
+    if (z=="Move Left"):
+        drone.control_tab.forward()
     
-cv2.destroyAllWindows()
+    if (z=="Move Right"):
+        drone.control_tab.backward()
+    
+if __name__ == "__main__":
 
-try:
+    print("Setting up detector")
+    cam = Camera()
+
     while True:
-        pass
-    
-except:
-    pass
+        #fps, image = d.get_detections(net,cam)
+        #data = det.get_detections()
+
+        try:
+            drone = Drone()
+            break
+
+        except Exception as e:
+            print(str(e))
+            sleep(2)
+        
+    while drone.is_active:
+        try:
+            #fps,image = det.get_detections()
+            det = detector(cam,drone)
+            data = det.get_detections()
+
+            # Convert image into RGB Format
+            #frame = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            frame = cv2.cvtColor(data[0][1], cv2.COLOR_BGR2RGB)
+            
+            # d.visualize(frame)
+            # z = (d.get_pose())
+            det.visualize(frame,data)
+            z = (det.get_pose())
+            print(z)
+
+            x = threading.Thread(target=thread_function, args=(z,))
+            x.start()
+
+            cv2.imshow("Capture",frame)
+            if cv2.waitKey(1) & 0XFF == ord('q'):
+                cam.close_camera()
+                break
+                
+        except Exception as e:
+            print(str(e))
+
+    cv2.destroyAllWindows()
