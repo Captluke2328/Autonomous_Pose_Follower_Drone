@@ -9,7 +9,7 @@ class detector:
         self.ca = C
         self.net = C.ne
         self.cam = C.camera
-        self.label = None
+        self.label = ""
 
         self.control = D.control_tab
 
