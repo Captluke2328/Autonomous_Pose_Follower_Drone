@@ -27,11 +27,20 @@ def thread_function(z):
     if (z=="Takeoff"):
         drone.control_tab.armAndTakeoff()
 
-    if (z=="Move Left"):
+    if (z=="Left"):
+        drone.control_tab.left()
+    
+    if (z=="Right"):
+        drone.control_tab.right()
+        
+    if (z=="Forward"):
         drone.control_tab.forward()
     
-    if (z=="Move Right"):
+    if (z=="Backward"):
         drone.control_tab.backward()
+        
+    if (z=="Searching"):
+        drone.control_tab.stop()
     
 if __name__ == "__main__":
 

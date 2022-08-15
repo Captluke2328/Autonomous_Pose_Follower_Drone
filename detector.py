@@ -14,12 +14,6 @@ class detector:
         self.control = D.control_tab
 
     def get_detections(self):
-        #global cx, cy,nose_idx,fps,label
-        #net = n
-        #cam = c
-        #net = c.net()
-        #cam = c.camera()
-
         cx = None
         cy = None
 
@@ -47,7 +41,7 @@ class detector:
             if right_wrist_idx < 0 or right_shoulder_idx <0:
                 continue
             
-            nose_point= pose.Keypoints[nose_idx]
+            nose_point = pose.Keypoints[nose_idx]
             neck_point = pose.Keypoints[neck_idx]
             left_wrist = pose.Keypoints[left_wrist_idx]
             left_shoulder = pose.Keypoints[left_shoulder_idx]
@@ -63,12 +57,18 @@ class detector:
                     #self.control.armAndTakeoff()
 
                 elif (left_wrist.y < left_shoulder.y) and (right_wrist.y > right_shoulder.y) and (left_wrist.y > nose_point.y) :
-                    self.label = "Move Left"
+                    self.label = "Left"
                     #self.control.forward()
                     
                 elif (right_wrist.y < right_shoulder.y) and (left_wrist.y > left_shoulder.y) and (right_wrist.y > nose_point.y):
-                    self.label = "Move Right"
+                    self.label = "Right"
                     #self.control.backward()
+                    
+                elif(left_wrist.y < left_shoulder.y) and (right_wrist.y > right_shoulder.y) and (left_wrist.y < nose_point.y) and (right_wrist.y > nose_point.y):
+                    self.label = "Forward"
+                    
+                elif(right_wrist.y < right_shoulder.y) and (left_wrist.y > left_shoulder.y) and (right_wrist.y < nose_point.y) and (left_wrist.y > nose_point.y):
+                    self.label = "Backward"
          
                 else:
                     self.label = "Searching"

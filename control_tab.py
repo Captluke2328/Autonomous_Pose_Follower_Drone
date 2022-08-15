@@ -86,6 +86,17 @@ class controlTab:
            2, 
         )
         self.engine_imp.send_global_velocity(0, 0, 0, 1)
+        
+    def stop(self):
+        print("Stop movement")
+        x,y,z = 0,0,0
+        self.engine_imp.send_global_velocity(
+        x,
+        y,
+        z,
+        2, 
+        )
+        self.engine_imp.send_global_velocity(0, 0, 0, 1)
 
     # def stopMovement(self):
     #     self.speed_x = 0
