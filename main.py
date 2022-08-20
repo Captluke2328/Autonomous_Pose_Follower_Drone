@@ -1,7 +1,7 @@
 import keyboard
 import jetson.inference
 import jetson.utils
-import sys, time
+import sys
 import threading
 import time
 
@@ -13,6 +13,7 @@ import sys
 #import detector as d
 from camera import *
 from detector import *
+from time import sleep
 
 from dronekit import *
 from config import *
@@ -22,26 +23,37 @@ from config import *
     #d.initialize_detector()
 #setup()
 
-def thread_function(z):
-    
-    if (z=="Takeoff"):
-        drone.control_tab.armAndTakeoff()
 
-    if (z=="Left"):
-        drone.control_tab.left()
-    
-    if (z=="Right"):
-        drone.control_tab.right()
+def thread_function(z):
+
+        # if (z=="Takeoff"):
+        #     drone.control_tab.armAndTakeoff()
+   
+        if (z=="Left"):
+            drone.control_tab.left()
         
-    if (z=="Forward"):
-        drone.control_tab.forward()
-    
-    if (z=="Backward"):
-        drone.control_tab.backward()
+        elif (z=="Right"):
+            drone.control_tab.right()
+            
+        elif (z=="Forward"):
+            drone.control_tab.forward()
         
-    if (z=="Searching"):
-        drone.control_tab.stop()
-    
+        elif (z=="Backward"):
+            drone.control_tab.backward()
+            
+        elif (z=="Searching"):
+            drone.control_tab.stop()
+
+        elif (z=="Land"):
+            drone.control_tab.goHome()
+
+        print(z)
+
+def arm_takeoff(s):
+    drone.control_tab.armAndTakeoff()
+
+s = "True"
+
 if __name__ == "__main__":
 
     print("Setting up detector")
@@ -73,11 +85,15 @@ if __name__ == "__main__":
             # z = (d.get_pose())
             det.visualize(frame,data)
             z = (det.get_pose())
-            print(z)
-
-            x = threading.Thread(target=thread_function, args=(z,))
-            x.start()
-
+            
+            if (z=="Takeoff") and (drone.control_tab.takeoff==False):
+                y = threading.Thread(target=arm_takeoff,args=(s,))
+                y.start()
+            
+            elif (z !="Takeoff") and (drone.control_tab.takeoff):
+                x = threading.Thread(target=thread_function, args=(z,))
+                x.start()
+            
             cv2.imshow("Capture",frame)
             if cv2.waitKey(1) & 0XFF == ord('q'):
                 cam.close_camera()

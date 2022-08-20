@@ -34,6 +34,8 @@ class detector:
             left_shoulder_idx = pose.FindKeypoint('left_shoulder')
             right_wrist_idx = pose.FindKeypoint('right_wrist')
             right_shoulder_idx = pose.FindKeypoint('right_shoulder')
+            left_elbow_idx = pose.FindKeypoint('left_elbow')
+            right_elbow_idx = pose.FindKeypoint('right_elbow')
             
             if left_wrist_idx < 0 or left_shoulder_idx <0:
                 continue
@@ -47,29 +49,34 @@ class detector:
             left_shoulder = pose.Keypoints[left_shoulder_idx]
             right_wrist = pose.Keypoints[right_wrist_idx]
             right_shoulder = pose.Keypoints[right_shoulder_idx]
+            left_elbow = pose.Keypoints[left_elbow_idx]
+            right_elbow = pose.Keypoints[right_elbow_idx]
 
             cx = neck_point.x
             cy = neck_point.y
             
             try:
-                if (left_wrist.y < left_shoulder.y) and (right_wrist.y < right_shoulder.y) and (left_wrist.y < nose_point.y) and (right_wrist.y < nose_point.y):
+                if (left_wrist.y < left_shoulder.y) and (right_wrist.y < right_shoulder.y) and (left_wrist.y < nose_point.y) and (right_wrist.y < nose_point.y) and (left_elbow.y < left_shoulder.y) and (right_elbow.y < right_shoulder.y):
                     self.label = "Takeoff"
                     #self.control.armAndTakeoff()
 
-                elif (left_wrist.y < left_shoulder.y) and (right_wrist.y > right_shoulder.y) and (left_wrist.y > nose_point.y) :
+                elif (left_wrist.y < left_shoulder.y) and (right_wrist.y > right_shoulder.y) and (left_wrist.y > nose_point.y) and (left_elbow.y > left_shoulder.y) and (right_elbow.y > right_shoulder.y):
                     self.label = "Left"
                     #self.control.forward()
                     
-                elif (right_wrist.y < right_shoulder.y) and (left_wrist.y > left_shoulder.y) and (right_wrist.y > nose_point.y):
+                elif (right_wrist.y < right_shoulder.y) and (left_wrist.y > left_shoulder.y) and (right_wrist.y > nose_point.y) and (left_elbow.y > left_shoulder.y) and (right_elbow.y > right_shoulder.y):
                     self.label = "Right"
                     #self.control.backward()
                     
-                elif(left_wrist.y < left_shoulder.y) and (right_wrist.y > right_shoulder.y) and (left_wrist.y < nose_point.y) and (right_wrist.y > nose_point.y):
+                elif(left_wrist.y < left_shoulder.y) and (right_wrist.y > right_shoulder.y) and (left_wrist.y < nose_point.y) and (right_wrist.y > nose_point.y) and (left_elbow.y < left_shoulder.y) and (right_elbow.y > right_shoulder.y):
                     self.label = "Forward"
                     
-                elif(right_wrist.y < right_shoulder.y) and (left_wrist.y > left_shoulder.y) and (right_wrist.y < nose_point.y) and (left_wrist.y > nose_point.y):
+                elif(right_wrist.y < right_shoulder.y) and (left_wrist.y > left_shoulder.y) and (right_wrist.y < nose_point.y) and (left_wrist.y > nose_point.y) and (left_elbow.y > left_shoulder.y) and (right_elbow.y < right_shoulder.y):
                     self.label = "Backward"
-         
+
+                elif(left_wrist.y < left_shoulder.y) and (right_wrist.y < right_shoulder.y) and (left_elbow.y < left_shoulder.y) and (right_elbow.y < right_shoulder.y) and (left_wrist.y > nose_point.y) and (right_wrist.y > nose_point.y):
+                    self.label = "Land" 
+                
                 else:
                     self.label = "Searching"
             except:

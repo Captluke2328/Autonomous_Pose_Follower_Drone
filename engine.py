@@ -13,7 +13,7 @@ class Engine:
         print("Engine has started-------", self.vehicle)
 
     def send_global_velocity(self,velocity_x, velocity_y, velocity_z, duration):
-        print("Speed Here !! ------->>> ") #, velocity_x, velocity_y, velocity_z
+        #print("Speed Here !! ------->>> ") #, velocity_x, velocity_y, velocity_z
         msg = self.vehicle.message_factory.set_position_target_global_int_encode(
         0,  # time_boot_ms (not used)
         0,
@@ -38,5 +38,25 @@ class Engine:
         for x in range(0, duration):
             self.vehicle.send_mavlink(msg)
             sleep(1)
+
+    def send_movement_command_XYA(self,velocity_x, velocity_y, altitude):
+        #velocity_x positive = forward. negative = backwards
+        #velocity_y positive = right. negative = left
+        #velocity_z positive = down. negative = up (Yes really!)
+
+        print("Sending XYZ movement command with v_x(forward/backward): %f v_y(right/left): %f " % (velocity_x,velocity_y))
+
+        msg = self.vehicle.message_factory.set_position_target_local_ned_encode(
+            0,      
+            0, 0,    
+            mavutil.mavlink.MAV_FRAME_BODY_NED,  #relative to drone heading pos relative to EKF origin
+            0b0000111111100011, #ignore velocity z and other pos arguments
+            0, 0, altitude,
+            velocity_x, velocity_y, 0, 
+            0, 0, 0, 
+            0, 0)    
+
+        self.vehicle.send_mavlink(msg)
+        #Vehicle.commands.flush()
         
         

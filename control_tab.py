@@ -11,6 +11,7 @@ class controlTab:
         self.drone = D
         self.THRESHOLD_ALT = 0.3
         self.engine_imp = Engine(self)
+        self.takeoff = False
 
     def armAndTakeoff(self):
         @self.vehicle.on_attribute('mode')
@@ -31,6 +32,7 @@ class controlTab:
                     self.vehicle.simple_takeoff(takeoff_alt)
                     while self.vehicle.location.global_relative_frame.alt < (takeoff_alt - self.THRESHOLD_ALT):
                         sleep(0.3)
+                    self.takeoff = True
                 else:
                     if (self.vehicle.location.global_relative_frame.alt > self.THRESHOLD_ALT):
                         self.vehicle.mode = VehicleMode("LAND")     
@@ -64,7 +66,7 @@ class controlTab:
     # Go Back
     def backward(self):
         print("Backward...")
-        x, y = -10, 0.0  # meters
+        x, y = -2.0, 0.0  # meters
         yaw = self.vehicle.attitude.yaw
         self.engine_imp.send_global_velocity(
             x * np.cos(yaw) - y * np.sin(yaw),
@@ -77,7 +79,7 @@ class controlTab:
     # Go Front
     def forward(self):
         print("Forward...")
-        x, y = 10, 0.0  # meters
+        x, y = 2.0, 0.0  # meters
         yaw = self.vehicle.attitude.yaw
         self.engine_imp.send_global_velocity(
            x * np.cos(yaw) - y * np.sin(yaw),
@@ -88,7 +90,7 @@ class controlTab:
         self.engine_imp.send_global_velocity(0, 0, 0, 1)
         
     def stop(self):
-        print("Stop movement")
+        #print("Stop movement")
         x,y,z = 0,0,0
         self.engine_imp.send_global_velocity(
         x,
@@ -97,6 +99,17 @@ class controlTab:
         2, 
         )
         self.engine_imp.send_global_velocity(0, 0, 0, 1)
+
+    def land(self):
+        print("Landing")
+        self.takeoff = False
+        self.vehicle.channels.overrides = {}
+        self.vehicle.mode = VehicleMode("LAND")
+
+    def goHome(self):
+        print('Going Home')
+        self.vehicle.mode = VehicleMode("RTL")
+        self.takeoff = False
 
     # def stopMovement(self):
     #     self.speed_x = 0
