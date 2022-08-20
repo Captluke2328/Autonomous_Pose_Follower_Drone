@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 from camera import *
 import threading
+from config import Drone
 from pid import *
 
 
@@ -87,9 +88,10 @@ class detector:
                     
                     #else:
                     #    self.label = "Searching"
-
-                    self.pid.findPID(cx,cy,w,h)
-                
+                    
+                    if (self.control.takeoff):
+                        self.pid.findPID(cx,cy,w,h)
+      
             except:
                 pass
                 

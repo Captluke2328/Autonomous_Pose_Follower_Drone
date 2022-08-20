@@ -24,11 +24,12 @@ from config import *
 #setup()
 
 
+def arm_takeoff():
+    drone.control_tab.armAndTakeoff()
+
+
 def thread_function(z):
 
-        # if (z=="Takeoff"):
-        #     drone.control_tab.armAndTakeoff()
-   
         if (z=="Left"):
             drone.control_tab.left()
         
@@ -48,11 +49,6 @@ def thread_function(z):
             drone.control_tab.goHome()
 
         print(z)
-
-def arm_takeoff(s):
-    drone.control_tab.armAndTakeoff()
-
-s = "True"
 
 if __name__ == "__main__":
 
@@ -87,7 +83,7 @@ if __name__ == "__main__":
             z = (det.get_pose())
             
             if (z=="Takeoff") and (drone.control_tab.takeoff==False):
-                y = threading.Thread(target=arm_takeoff,args=(s,))
+                y = threading.Thread(target=arm_takeoff)
                 y.start()
             
             elif (z !="Takeoff") and (drone.control_tab.takeoff):
