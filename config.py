@@ -3,11 +3,13 @@ import socket
 from time import sleep
 from control_tab import *
 from engine import *
+from pid import *
 
 class Drone:
     def __init__(self):
         try:
             self.connection_string = '127.0.0.1:14550'
+            #self.connection_string = '/dev/ttyTHS1,921600'
             self.vehicle = connect(self.connection_string, wait_ready=True)
             print("Virtual Copter is ready")
 

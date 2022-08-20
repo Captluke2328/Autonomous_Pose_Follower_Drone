@@ -59,4 +59,30 @@ class Engine:
         self.vehicle.send_mavlink(msg)
         #Vehicle.commands.flush()
         
+    def send_movement_command_YAW(self,heading):
+        speed = 0 
+        direction = 1 #direction -1 ccw, 1 cw   
+        #heading 0 to 360 degree. if negative then ccw 
+        
+        print("Sending YAW movement command with heading: %f" % heading)
+
+        if heading < 0:
+            heading = heading*-1
+            direction = -1
+            
+        print(direction,heading)
+        #point drone into correct heading 
+        msg = self.vehicle.message_factory.command_long_encode(
+            0, 0,       
+            mavutil.mavlink.MAV_CMD_CONDITION_YAW, 
+            0,          
+            heading,    
+            speed,      #speed deg/s
+            direction,  
+            1,          #relative offset 1
+            0, 0, 0)    
+
+        # send command to vehicle
+        self.vehicle.send_mavlink(msg)
+        #Vehicle.commands.flush()
         

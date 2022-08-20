@@ -111,6 +111,10 @@ class controlTab:
         self.vehicle.mode = VehicleMode("RTL")
         self.takeoff = False
 
+    def yaw(self,cx,cy):
+        print("Tracking")
+        self.engine_imp.send_movement_command_YAW(cx)
+
     # def stopMovement(self):
     #     self.speed_x = 0
     #     self.speed_y = 0

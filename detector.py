@@ -3,6 +3,9 @@ import jetson.utils
 import cv2
 import numpy as np
 from camera import *
+import threading
+from pid import *
+
 
 class detector:
     def __init__(self,C,D):
@@ -10,8 +13,10 @@ class detector:
         self.net = C.ne
         self.cam = C.camera
         self.label = ""
-
         self.control = D.control_tab
+
+        self.pid = pid(D)
+        self.pid.start()
 
     def get_detections(self):
         cx = None
@@ -54,31 +59,37 @@ class detector:
 
             cx = neck_point.x
             cy = neck_point.y
+            w, h = self.ca.get_image_size()
             
-            try:
-                if (left_wrist.y < left_shoulder.y) and (right_wrist.y < right_shoulder.y) and (left_wrist.y < nose_point.y) and (right_wrist.y < nose_point.y) and (left_elbow.y < left_shoulder.y) and (right_elbow.y < right_shoulder.y):
-                    self.label = "Takeoff"
-                    #self.control.armAndTakeoff()
-
-                elif (left_wrist.y < left_shoulder.y) and (right_wrist.y > right_shoulder.y) and (left_wrist.y > nose_point.y) and (left_elbow.y > left_shoulder.y) and (right_elbow.y > right_shoulder.y):
-                    self.label = "Left"
-                    #self.control.forward()
-                    
-                elif (right_wrist.y < right_shoulder.y) and (left_wrist.y > left_shoulder.y) and (right_wrist.y > nose_point.y) and (left_elbow.y > left_shoulder.y) and (right_elbow.y > right_shoulder.y):
-                    self.label = "Right"
-                    #self.control.backward()
-                    
-                elif(left_wrist.y < left_shoulder.y) and (right_wrist.y > right_shoulder.y) and (left_wrist.y < nose_point.y) and (right_wrist.y > nose_point.y) and (left_elbow.y < left_shoulder.y) and (right_elbow.y > right_shoulder.y):
-                    self.label = "Forward"
-                    
-                elif(right_wrist.y < right_shoulder.y) and (left_wrist.y > left_shoulder.y) and (right_wrist.y < nose_point.y) and (left_wrist.y > nose_point.y) and (left_elbow.y > left_shoulder.y) and (right_elbow.y < right_shoulder.y):
-                    self.label = "Backward"
-
-                elif(left_wrist.y < left_shoulder.y) and (right_wrist.y < right_shoulder.y) and (left_elbow.y < left_shoulder.y) and (right_elbow.y < right_shoulder.y) and (left_wrist.y > nose_point.y) and (right_wrist.y > nose_point.y):
-                    self.label = "Land" 
+            try:           
+                if (neck_point.x != 0) or (neck_point.y != 0):
                 
-                else:
-                    self.label = "Searching"
+                    if (left_wrist.y < left_shoulder.y) and (right_wrist.y < right_shoulder.y) and (left_wrist.y < nose_point.y) and (right_wrist.y < nose_point.y) and (left_elbow.y < left_shoulder.y) and (right_elbow.y < right_shoulder.y):
+                        self.label = "Takeoff"
+                        #self.control.armAndTakeoff()
+
+                    elif (left_wrist.y < left_shoulder.y) and (right_wrist.y > right_shoulder.y) and (left_wrist.y > nose_point.y) and (left_elbow.y > left_shoulder.y) and (right_elbow.y > right_shoulder.y):
+                        self.label = "Left"
+                        #self.control.forward()
+                        
+                    elif (right_wrist.y < right_shoulder.y) and (left_wrist.y > left_shoulder.y) and (right_wrist.y > nose_point.y) and (left_elbow.y > left_shoulder.y) and (right_elbow.y > right_shoulder.y):
+                        self.label = "Right"
+                        #self.control.backward()
+                        
+                    elif(left_wrist.y < left_shoulder.y) and (right_wrist.y > right_shoulder.y) and (left_wrist.y < nose_point.y) and (right_wrist.y > nose_point.y) and (left_elbow.y < left_shoulder.y) and (right_elbow.y > right_shoulder.y):
+                        self.label = "Forward"
+                        
+                    elif(right_wrist.y < right_shoulder.y) and (left_wrist.y > left_shoulder.y) and (right_wrist.y < nose_point.y) and (left_wrist.y > nose_point.y) and (left_elbow.y > left_shoulder.y) and (right_elbow.y < right_shoulder.y):
+                        self.label = "Backward"
+
+                    elif(left_wrist.y < left_shoulder.y) and (right_wrist.y < right_shoulder.y) and (left_elbow.y < left_shoulder.y) and (right_elbow.y < right_shoulder.y) and (left_wrist.y > nose_point.y) and (right_wrist.y > nose_point.y):
+                        self.label = "Land" 
+                    
+                    #else:
+                    #    self.label = "Searching"
+
+                    self.pid.findPID(cx,cy,w,h)
+                
             except:
                 pass
                 

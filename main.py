@@ -41,8 +41,8 @@ def thread_function(z):
         elif (z=="Backward"):
             drone.control_tab.backward()
             
-        elif (z=="Searching"):
-            drone.control_tab.stop()
+        #elif (z=="Searching"):
+        #    drone.control_tab.stop()
 
         elif (z=="Land"):
             drone.control_tab.goHome()
